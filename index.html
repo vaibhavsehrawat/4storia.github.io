@@ -39,7 +39,7 @@
             <iframe id="programmatic-iframe"></iframe>
         </div>
                 <script id="pendo-snippet">
-                    var someAppIframe = document.querySelector('#programmatic-iframe').contentWindow.href = 'https://someapp.com';
+                    var someAppIframe = document.querySelector('#programmatic-iframe').contentWindow.location.href = 'https://someapp.com';
 
                     function addSnippetToFrame(iframe) {
                         var readyState = iframe.contentWindow.document.readyState;

@@ -47,11 +47,11 @@
             height: 400px;
         }
 
-        button:after {
+        .frame-toggle:after {
             content: "hide this frame"
         }
 
-        button.toggled:after {
+        .frame-toggle.toggled:after {
             content: "show this frame";
         }
     </style>
@@ -67,11 +67,11 @@
     <div class="subtitle">Iframes also need to be part of a different hostname so window.frameElement = null</div>
     <div class="iframe-container">
         <div class="container">
-            <button onclick="hideFrame('frame1', this)"></button>
+            <button class="frame-toggle" onclick="hideFrame('frame1', this)"></button>
             <iframe id="frame1" src="https://yrollam.github.io/malypso-iframe-town-inner-3.html"></iframe>
         </div>
         <div class="container">
-            <button onclick="hideFrame('frame2', this)"></button>
+            <button class="frame-toggle" onclick="hideFrame('frame2', this)"></button>
             <iframe id="frame2" src="https://yrollam.github.io/malypso-iframe-town-inner-3.html"></iframe>
         </div>
     </div>

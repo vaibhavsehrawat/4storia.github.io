@@ -2,14 +2,14 @@
     <head>
         <script>
             window.addEventListener('message', (event) => {
-                console.log("Earliest possible listener")
+                console.log("Earliest possible listener", event.data)
             });
         </script>
     </head>
     <body>
         <script>
             window.addEventListener('message', (event) => {
-                console.log("body script!")
+                console.log("body script!", event.data)
             });
         </script>
     </body>

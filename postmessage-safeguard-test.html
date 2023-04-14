@@ -1,7 +1,7 @@
 <html>
     <head>
         <script>
-            window.MAIN_CONTEXT = true;
+            window._MAIN_CONTEXT = true;
             console.log("adding earliest possible listener")
             window.addEventListener('message', (event) => {
                 console.log("Earliest possible listener", event.data)

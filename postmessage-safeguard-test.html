@@ -1,18 +1,17 @@
 <html>
     <head>
         <script>
-            window._MAIN_CONTEXT = true;
-            console.log("adding earliest possible listener")
             window.addEventListener('message', (event) => {
-                console.log("Earliest possible listener", event.data)
+                console.log("Earliest possible listener - extension probably can't catch this", event.data)
             });
         </script>
     </head>
     <body>
         <script>
-            console.log("adding body listener");
             window.addEventListener('message', (event) => {
-                console.log("body script!", event.data)
+                if(!event.data) return;
+                console.error("body script message handler - should not have caught this pendo message");
+                console.log('event: ', event)
             });
         </script>
     </body>

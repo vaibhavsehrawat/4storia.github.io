@@ -1,0 +1,144 @@
+<html>
+    <head>
+        <script>
+            (function (apiKey) {
+                (function (p, e, n, d, o) {
+                    var v, w, x, y, z; o = p[d] = p[d] || {}; o._q = o._q || [];
+                    v = ['initialize', 'identify', 'updateOptions', 'pageLoad', 'track']; for (w = 0, x = v.length; w < x; ++w)(function (m) {
+                        o[m] = o[m] || function () {o._q[m === v[0] ? 'unshift' : 'push']([m].concat([].slice.call(arguments, 0)));};
+                    })(v[w]);
+                    y = e.createElement(n); y.async = !0; y.src = 'https://cdn.pendo-dev.pendo-dev.com/agent/static/' + apiKey + '/pendo.js';
+                    z = e.getElementsByTagName(n)[0]; z.parentNode.insertBefore(y, z);
+                })(window, document, 'script', 'pendo');
+
+                // This function creates visitors and accounts in Pendo
+                // You will need to replace <visitor-id-goes-here> and <account-id-goes-here> with values you use in your app
+                // Please use Strings, Numbers, or Bools for value types.
+                pendo.initialize({
+                    visitor: {
+                        id: 'test-visitor'
+                    },
+                    account: {
+                        id: 'some-account'
+                    }
+                });
+        })('eab141a0-2605-4a1f-7703-6f059440abe7');
+        </script>
+        <style>
+            body {
+                padding: 0px;
+                margin: 0px;
+                border: 3px solid lightcoral;
+                display: flex;
+                flex: 1;
+            }
+
+            .big__container {
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+            }
+
+            .big__nav-list {
+                display: flex;
+                list-style-type: none;
+                padding: 10px;
+                border-bottom: 1px solid gray;
+                margin: 0;
+            }
+
+            .big__nav-list li {
+                margin-right: 100px;
+            }
+
+            #big__app-container {
+                flex: 1;
+                display: flex;
+            }
+
+            .big__inner-app {
+                background-color: lightcoral;
+                flex-grow: 1;
+            }
+
+            .little__inner-app {
+                background-color: aquamarine;
+                flex-grow: 1;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="big__container">
+            <nav class="big__nav-bar">
+                <ul class="big__nav-list">
+                    <li class="big__nav-item-1">
+                        <button id="big__show-big-app">
+                            Show big app
+                        </button>
+                    </li>
+                    <li class="big__nav-item-2">
+                        <button id="big__show-little-app">
+                            Show little app
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+            <div id="big__app-container" />
+        </div>
+        <script>
+            function injectBigAppContent() {
+                const container = document.getElementById('big__app-container');
+                container.innerHTML = '';
+
+                const bigAppContent = document.createElement('div');
+                bigAppContent.classList.add('big__inner-app');
+                bigAppContent.innerHTML = `
+                    <div class="big__inner-app__title">
+                        I'm still part of the big app!
+                    </div>
+                    <div class="big__inner-app__content">
+                        I have some content and some buttons, but it all should still roll up to the big app.<br>
+                        <button id="big__random_button_1">
+                            Random button #1
+                        </button>
+                        <button id="big__random_button_2">
+                            Random button #2
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(bigAppContent);
+            }
+
+            function injectLittleAppContent() {
+                const container = document.getElementById('big__app-container');
+                container.innerHTML = '';
+
+                const littleAppContent = document.createElement('div');
+                littleAppContent.classList.add('little__inner-app');
+                littleAppContent.setAttribute('data-pendo-api-key', 'e14a1987-d2a4-412c-5502-bc77bb352bb3')
+                littleAppContent.innerHTML = `
+                    <div class="little__inner-app__title">
+                        I'm a lil tiny app
+                    </div>
+                    <div class="little__inner-app__content">
+                        I have some content and some buttons, and none of it should roll up to the big app.<br>
+                        <button id="little__random_button_3">
+                            Random button #3
+                        </button>
+                        <button id="little__random_button_4">
+                            Random button #4
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(littleAppContent);
+            }
+
+            injectBigAppContent();
+
+            document.getElementById('big__show-big-app').addEventListener('click', injectBigAppContent);
+            document.getElementById('big__show-little-app').addEventListener('click', injectLittleAppContent);
+        </script>
+    </body>
+</html>

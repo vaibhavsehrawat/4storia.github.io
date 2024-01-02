@@ -220,7 +220,11 @@
 
                 if(changeObj.client && changeObj.client !== routeInternals.client) {
                     routeInternals.client = changeObj.client;
-                    shouldTeardown = true;
+                    pendo.updateOptions({
+                        account: {
+                            id: changeObj.client
+                        }
+                    });
                 }
 
                 if(changeObj.topLevelApp && changeObj.topLevelApp !== routeInternals.topLevelApp) {
@@ -234,7 +238,7 @@
             }
 
             function teardownPendo(routeInternals) {
-                const apiKey = apiKeys[routeInternals.topLevelApp];
+                const apiKey = apiKeys[routeInternals.topLevelApp] || apiKeys.default;
                 const accountId = routeInternals.client;
 
                 const options = {

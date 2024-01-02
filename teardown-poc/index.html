@@ -78,6 +78,18 @@
         <div id="content">
             This is the home page!
         </div>
+        <script id="pendo-agent-f234c0f8-0316-401f-4f2d-fdae06690630">
+            (function (apiKey) {
+                (function (p, e, n, d, o) {
+                    var v, w, x, y, z; o = p[d] = p[d] || {}; o._q = o._q || [];
+                    v = ['initialize', 'identify', 'updateOptions', 'pageLoad', 'track']; for (w = 0, x = v.length; w < x; ++w)(function (m) {
+                        o[m] = o[m] || function () {o._q[m === v[0] ? 'unshift' : 'push']([m].concat([].slice.call(arguments, 0)));};
+                    })(v[w]);
+                    y = e.createElement(n); y.async = !0; y.src = 'https://cdn.pendo-dev.pendo-dev.com/agent/static/' + apiKey + '/pendo.js';
+                    z = e.getElementsByTagName(n)[0]; z.parentNode.insertBefore(y, z);
+                })(window, document, 'script', 'pendo');
+            })('f234c0f8-0316-401f-4f2d-fdae06690630');
+        </script>
 
         <template id="client-template">
             <div id="left-nav-bar">
@@ -115,6 +127,17 @@
         <script>
             const templateStringRegex = /{{\s*([a-zA-Z0-9_]+)\s*}}/g;
             const routeInternals = {};
+            const visitorId = window.location.search.split('visitorId=')[1] || 'test-visitor';
+
+            pendo.initialize({
+                visitor: {
+                    id: visitorId
+                },
+                account: {
+                    id: 'wpp-open'
+                }
+            });
+
             const clientDetails = {
                 'paws-and-tails': {
                     clientName: 'Paws & Tails'
@@ -141,8 +164,9 @@
                 }
             };
             const apiKeys = {
-                'Architect': '1234',
-                'Explorer': '5678'
+                'default': 'f234c0f8-0316-401f-4f2d-fdae06690630',
+                'Architect': 'e643fcf9-deea-4bdc-56d8-f1f63a40676e',
+                'Explorer': 'daebc314-b236-4844-510c-ac6db613bfc3'
             };
 
             const clientSelect = document.querySelector('#client-select');
@@ -210,7 +234,46 @@
             }
 
             function teardownPendo(routeInternals) {
+                const apiKey = apiKeys[routeInternals.topLevelApp];
+                const accountId = routeInternals.client;
 
+                const options = {
+                    visitor: {
+                        id: visitorId
+                    },
+                    account: {
+                        id: accountId
+                    }
+                };
+
+                initializePendo(apiKey, options);
+            }
+
+            function initializePendo(apiKey, options) {
+                return new Promise(function (resolve) {
+                    const id = `pendo-agent-${apiKey}`;
+                    if (window.pendo && window.pendo.teardown) {
+                        window.pendo.teardown();
+                        delete window.pendo;
+                    }
+
+                    let script = document.getElementById(id);
+                    if (script) {
+                        window.pendo = window[id];
+                        window.pendo.initialize(options);
+                        resolve();
+                    } else {
+                        script = document.createElement('script');
+                        script.id = id;
+                        script.onload = function () {
+                            window[id] = window.pendo;
+                            window.pendo.initialize(options);
+                            resolve();
+                        };
+                        script.src = `https://cdn.pendo.io/agent/static/${apiKey}/pendo.js`;
+                        document.head.appendChild(script);
+                    }
+                });
             }
         </script>
     </body>

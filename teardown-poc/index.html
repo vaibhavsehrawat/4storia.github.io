@@ -1,0 +1,217 @@
+<html>
+    <head>
+        <style>
+            body {
+                font-size: 18px;
+                margin: 0px;
+            }
+
+            ul {
+                list-style-type: none;
+                padding-left: 0px;
+            }
+
+            #nav-bar {
+                height: 50px;
+                width: 100%;
+                background-color: #CCC;
+                display: flex;
+                align-items: center;
+                padding: 10px;
+                box-sizing: border-box;
+                margin-bottom: 10px;
+            }
+
+            #header {
+                padding-right: 10px;
+                font-size: 18px;
+            }
+
+            #client-select {
+                height: 30px;
+                width: 200px;
+                font-size: 18px;
+            }
+
+            #content {
+                display: flex;
+                height: calc(100% - 60px);
+            }
+
+            #left-nav-bar {
+                width: 200px;
+                height: 100%;
+                background-color: #CCC;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+
+            .nav-section {
+                padding-bottom: 10px;
+            }
+
+            .nav-item {
+                cursor: pointer;
+                margin-left: 10px;
+            }
+
+            .nav-item:hover {
+                text-decoration: underline;
+            }
+
+            #app-content {
+                margin-left: 10px;
+                box-sizing: border-box;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="nav-bar">
+            <div id="header">POC</div>
+            <select id="client-select" value="">
+                <option value="" selected disabled>Select a client</option>
+                <option value="paws-and-tails">Paws & Tails</option>
+                <option value="choreograph">Choreograph</option>
+                <option value="greenhouse">Greenhouse</option>
+            </select>
+        </div>
+        <div id="content">
+            This is the home page!
+        </div>
+
+        <template id="client-template">
+            <div id="left-nav-bar">
+                <div class="title">{{ clientName }} Apps</div>
+                <ul>
+                    <li class="nav-section">
+                        Architect
+                        <ul>
+                            <li class="nav-item">Audiences</li>
+                            <li class="nav-item">Touchpoints</li>
+                        </ul>
+                    </li>
+                    <li class="nav-section">
+                        Explorer
+                        <ul>
+                            <li class="nav-item">Audience Origin</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div id="app-content"></div>
+        </template>
+
+        <template id="app-template">
+            <div class="heading">
+                You're currently viewing {{ topLevelApp }} - {{ secondLevelApp }} for {{ clientName }}
+            </div>
+            <div>
+                <button>Button 1</button>
+                <button>Button 2</button>
+                <button>Button 3</button>
+            </div>
+        </template>
+
+        <script>
+            const templateStringRegex = /{{\s*([a-zA-Z0-9_]+)\s*}}/g;
+            const routeInternals = {};
+            const clientDetails = {
+                'paws-and-tails': {
+                    clientName: 'Paws & Tails'
+                },
+                'choreograph': {
+                    clientName: 'Choreograph'
+                },
+                'greenhouse': {
+                    clientName: 'Greenhouse'
+                }
+            };
+            const fakeRouteDetails = {
+                'Audiences': {
+                    topLevelApp: 'Architect',
+                    secondLevelApp: 'Audiences'
+                },
+                'Touchpoints': {
+                    topLevelApp: 'Architect',
+                    secondLevelApp: 'Touchpoints'
+                },
+                'Audience Origin': {
+                    topLevelApp: 'Explorer',
+                    secondLevelApp: 'Audience Origin'
+                }
+            };
+            const apiKeys = {
+                'Architect': '1234',
+                'Explorer': '5678'
+            };
+
+            const clientSelect = document.querySelector('#client-select');
+            const content = document.querySelector('#content');
+
+            clientSelect.addEventListener('change', (e) => {
+                const client = e.target.value;
+
+                if (client && routeInternals.client !== client) {
+                    updateRouteInternals({ client });
+                    changeClient(client);
+                }
+            });
+
+            function changeClient(clientKey) {
+                const template = document.querySelector('#client-template');
+                const templateString = template.innerHTML.slice();
+
+                const clientData = clientDetails[clientKey];
+
+                const interpolatedHtml = templateString.replace(templateStringRegex, (match, key) => {
+                    return clientData[key];
+                });
+
+                content.innerHTML = interpolatedHtml;
+                activateAppNavItems();
+            }
+
+            function activateAppNavItems() {
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach((navItem) => {
+                    navItem.addEventListener('click', (e) => {
+                        const app = e.target.innerHTML;
+                        const appContent = document.querySelector('#app-content');
+                        const template = document.querySelector('#app-template');
+                        const templateString = template.innerHTML.slice();
+
+                        const interpolatedHtml = templateString.replace(templateStringRegex, (match, key) => {
+                            return fakeRouteDetails[app][key] || clientDetails[routeInternals.client][key];
+                        });
+
+                        appContent.innerHTML = interpolatedHtml;
+
+                        updateRouteInternals({ topLevelApp: fakeRouteDetails[app].topLevelApp });
+                    });
+                });
+            }
+
+            function updateRouteInternals(changeObj) {
+                let shouldTeardown = false;
+
+                if(changeObj.client && changeObj.client !== routeInternals.client) {
+                    routeInternals.client = changeObj.client;
+                    shouldTeardown = true;
+                }
+
+                if(changeObj.topLevelApp && changeObj.topLevelApp !== routeInternals.topLevelApp) {
+                    routeInternals.topLevelApp = changeObj.topLevelApp;
+                    shouldTeardown = true;
+                }
+
+                if(shouldTeardown) {
+                    teardownPendo(routeInternals);
+                }
+            }
+
+            function teardownPendo(routeInternals) {
+
+            }
+        </script>
+    </body>
+</html>

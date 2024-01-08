@@ -236,7 +236,7 @@
 
                 if(changeObj.client && changeObj.client !== routeInternals.client) {
                     routeInternals.client = changeObj.client;
-                    pendo.updateOptions({
+                    pendo?.updateOptions({
                         account: {
                             id: changeObj.client
                         }

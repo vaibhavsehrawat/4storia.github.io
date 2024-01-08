@@ -292,7 +292,7 @@
                 content.innerHTML = 'This is the home page!';
 
                 window.history.pushState({}, '', `?`);
-                teardownPendo();
+                teardownPendo(routeInternals);
             }
 
             function teardownPendo(routeInternals) {

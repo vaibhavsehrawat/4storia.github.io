@@ -25,6 +25,7 @@
             #header {
                 padding-right: 10px;
                 font-size: 18px;
+                cursor: pointer;
             }
 
             #client-select {
@@ -67,7 +68,7 @@
     </head>
     <body>
         <div id="nav-bar">
-            <div id="header">POC</div>
+            <a id="header">POC</a>
             <select id="client-select" value="">
                 <option value="" selected disabled>Select a client</option>
                 <option value="paws-and-tails">Paws & Tails</option>
@@ -129,15 +130,6 @@
             const routeInternals = {};
             const visitorId = window.location.search.split('visitorId=')[1] || 'test-visitor';
 
-            pendo.initialize({
-                visitor: {
-                    id: visitorId
-                },
-                account: {
-                    id: 'wpp-open'
-                }
-            });
-
             const clientDetails = {
                 'paws-and-tails': {
                     clientName: 'Paws & Tails'
@@ -171,6 +163,7 @@
 
             const clientSelect = document.querySelector('#client-select');
             const content = document.querySelector('#content');
+            const header = document.querySelector('#header');
 
             clientSelect.addEventListener('change', (e) => {
                 const client = e.target.value;
@@ -178,6 +171,20 @@
                 if (client && routeInternals.client !== client) {
                     updateRouteInternals({ client });
                     changeClient(client);
+                }
+            });
+
+            header.addEventListener('click', () => {
+                backToDefault();
+            });
+
+            parseRouteHash();
+            pendo.initialize({
+                visitor: {
+                    id: visitorId
+                },
+                account: {
+                    id: 'wpp-open'
                 }
             });
 
@@ -200,19 +207,46 @@
                 navItems.forEach((navItem) => {
                     navItem.addEventListener('click', (e) => {
                         const app = e.target.innerHTML;
-                        const appContent = document.querySelector('#app-content');
-                        const template = document.querySelector('#app-template');
-                        const templateString = template.innerHTML.slice();
-
-                        const interpolatedHtml = templateString.replace(templateStringRegex, (match, key) => {
-                            return fakeRouteDetails[app][key] || clientDetails[routeInternals.client][key];
-                        });
-
-                        appContent.innerHTML = interpolatedHtml;
-
-                        updateRouteInternals({ topLevelApp: fakeRouteDetails[app].topLevelApp });
+                        appNavItemRoute(app);
                     });
                 });
+            }
+
+            function appNavItemRoute(app) {
+                const appContent = document.querySelector('#app-content');
+                const template = document.querySelector('#app-template');
+                const templateString = template.innerHTML.slice();
+
+                const interpolatedHtml = templateString.replace(templateStringRegex, (match, key) => {
+                    return fakeRouteDetails[app][key] || clientDetails[routeInternals.client][key];
+                });
+
+                appContent.innerHTML = interpolatedHtml;
+
+                updateRouteInternals({topLevelApp: fakeRouteDetails[app].topLevelApp, secondLevelApp: fakeRouteDetails[app].secondLevelApp});
+            }
+
+            function parseRouteHash() {
+                const routeHash = window.location.search.slice(1);
+                const routeHashParts = routeHash.split('&');
+
+                const changeObj = routeHashParts.reduce((acc, part) => {
+                    const [key, value] = part.split('=');
+                    acc[key] = decodeURIComponent(value);
+
+                    return acc;
+                }, {});
+
+                updateRouteInternals(changeObj);
+
+                if(changeObj.client) {
+                    clientSelect.value = changeObj.client;
+                    changeClient(changeObj.client);
+                }
+
+                if(changeObj.secondLevelApp) {
+                    appNavItemRoute(changeObj.secondLevelApp);
+                }
             }
 
             function updateRouteInternals(changeObj) {
@@ -232,13 +266,37 @@
                     shouldTeardown = true;
                 }
 
+                if(changeObj.secondLevelApp) {
+                    routeInternals.secondLevelApp = changeObj.secondLevelApp;
+                } else {
+                    delete routeInternals.secondLevelApp;
+                }
+
                 if(shouldTeardown) {
                     teardownPendo(routeInternals);
                 }
+
+                const routeHash = Object.keys(routeInternals).map((key) => {
+                    return `${key}=${routeInternals[key]}`;
+                }).join('&');
+
+                window.history.pushState({}, '', `?${routeHash}`);
+            }
+
+            function backToDefault() {
+                Object.keys(routeInternals).forEach((key) => {
+                    delete routeInternals[key];
+                });
+
+                clientSelect.value = '';
+                content.innerHTML = 'This is the home page!';
+
+                window.history.pushState({}, '', `?`);
             }
 
             function teardownPendo(routeInternals) {
                 const apiKey = apiKeys[routeInternals.topLevelApp] || apiKeys.default;
+                console.log("setting api key to", apiKey)
                 const accountId = routeInternals.client;
 
                 const options = {

@@ -79,18 +79,6 @@
         <div id="content">
             This is the home page!
         </div>
-        <script id="pendo-agent-b3cc3979-a999-4b6e-74ab-2c55595dddcc">
-            (function (apiKey) {
-                (function (p, e, n, d, o) {
-                    var v, w, x, y, z; o = p[d] = p[d] || {}; o._q = o._q || [];
-                    v = ['initialize', 'identify', 'updateOptions', 'pageLoad', 'track']; for (w = 0, x = v.length; w < x; ++w)(function (m) {
-                        o[m] = o[m] || function () {o._q[m === v[0] ? 'unshift' : 'push']([m].concat([].slice.call(arguments, 0)));};
-                    })(v[w]);
-                    y = e.createElement(n); y.async = !0; y.src = 'https://cdn.pendo.io/agent/static/' + apiKey + '/pendo.js';
-                    z = e.getElementsByTagName(n)[0]; z.parentNode.insertBefore(y, z);
-                })(window, document, 'script', 'pendo');
-            })('b3cc3979-a999-4b6e-74ab-2c55595dddcc');
-        </script>
 
         <template id="client-template">
             <div id="left-nav-bar">
@@ -179,14 +167,6 @@
             });
 
             parseRouteHash();
-            pendo.initialize({
-                visitor: {
-                    id: visitorId
-                },
-                account: {
-                    id: 'wpp-open'
-                }
-            });
 
             function changeClient(clientKey) {
                 const template = document.querySelector('#client-template');
@@ -247,6 +227,8 @@
                 if(changeObj.secondLevelApp) {
                     appNavItemRoute(changeObj.secondLevelApp);
                 }
+
+                teardownPendo(routeInternals);
             }
 
             function updateRouteInternals(changeObj) {
@@ -297,7 +279,6 @@
 
             function teardownPendo(routeInternals) {
                 const apiKey = apiKeys[routeInternals.topLevelApp] || apiKeys.default;
-                console.log("setting api key to", apiKey)
                 const accountId = routeInternals.client;
 
                 const options = {
@@ -305,7 +286,7 @@
                         id: visitorId
                     },
                     account: {
-                        id: accountId
+                        id: accountId || 'wpp-open'
                     }
                 };
 
